@@ -10,8 +10,11 @@ flash_on  = "http://" + ip + ":8080/enabletorch"
 flash_off = "http://" + ip + ":8080/disabletorch"
 
 last_photos = []
-stripes = cv2.imread('stripes.jpg', 1)
-stripes = cv2.resize(stripes, (880, 165))
+wrapping_paper = cv2.imread('lights.jpg', 1)
+##stripes = cv2.resize(stripes, (880, 165))
+stripes = wrapping_paper[0:165, 0:880]
+snow = cv2.imread('snow_flakes.jpg', 1)
+background = snow[0:1024,0:1280]
 
 pic_num = 0
 flash = False
@@ -37,7 +40,8 @@ while True:
     img = cv2.imdecode(img_arr, -1)
     img_big = cv2.resize(img, (880, 660))
     img_stripes = np.concatenate((img_big, stripes), axis=0)
-    cv2.imshow("Android Cam", img_stripes)
+    background[0:825,200:1080] = img_stripes
+    cv2.imshow("Android Cam", background)
 
     k = cv2.waitKey(30)
     if k == 27:                  
@@ -54,7 +58,7 @@ while True:
         cv2.imwrite("wapo_" + str(pic_num) + ".jpg", img_4k)
         pic_num += 1
         last_photos.append(img)
-        print("Okay Cool")
+        print("Okay Cool")        
     elif k == 102:
         if flash:
             requests.get(flash_off)
