@@ -100,64 +100,65 @@ def show_1(full_img):
     
     
 
-def take_pic(photo, last_photos, stripes, wrapping_paper, pic_num):
-    frames = 0
-    while True:
-        if len(last_photos) == 1:
-            stripes[15:150,20:200] = cv2.resize(last_photos[-1], (180, 135))
-        elif len(last_photos) == 2:
-            stripes[15:150,20:200]  = cv2.resize(last_photos[-1], (180, 135))
-            stripes[15:150,240:420] = cv2.resize(last_photos[-2], (180, 135))
-        elif len(last_photos) == 3:
-            stripes[15:150,20:200]  = cv2.resize(last_photos[-1], (180, 135))
-            stripes[15:150,240:420] = cv2.resize(last_photos[-2], (180, 135))
-            stripes[15:150,460:640] = cv2.resize(last_photos[-3], (180, 135))
-        elif len(last_photos) >= 4:
-            stripes[15:150,20:200]  = cv2.resize(last_photos[-1], (180, 135))
-            stripes[15:150,240:420] = cv2.resize(last_photos[-2], (180, 135))
-            stripes[15:150,460:640] = cv2.resize(last_photos[-3], (180, 135))
-            stripes[15:150,680:860] = cv2.resize(last_photos[-4], (180, 135))
-        img_resp = requests.get(shot)
-        img_arr  = np.array(bytearray(img_resp.content), dtype=np.uint8)
-        img = cv2.imdecode(img_arr, -1)
-        img_big = cv2.resize(img, (880, 660))
-        img_stripes = np.concatenate((img_big, stripes), axis=0)
-        background[75:900,200:1080] = img_stripes
-        if ((frames > 0)  and (frames < 5)):
-            print("3")
-##        if ((frames > 10) and (frames < 20)):
-##            print("-")
-        if ((frames > 10) and (frames < 15)):
-            print("2")
-##        if ((frames > 30) and (frames < 40)):
-##            print("-")
-        if ((frames > 20) and (frames < 25)):
-            print("1")
-##        if ((frames > 50) and (frames < 60)):
-##            print("-")
-        if (frames > 30):
-##            print("Taking Pic")
-        ##    requests.get(flash_on)
-            img_resp = requests.get(photo)
-        ##    requests.get(flash_off)
+def take_pic(photo, last_photos, stripes, wrapping_paper, pic_num, background):
+    for i in range(4):
+        frames = 0
+        while True:
+            if len(last_photos) == 1:
+                stripes[15:150,20:200] = cv2.resize(last_photos[-1], (180, 135))
+            elif len(last_photos) == 2:
+                stripes[15:150,20:200]  = cv2.resize(last_photos[-1], (180, 135))
+                stripes[15:150,240:420] = cv2.resize(last_photos[-2], (180, 135))
+            elif len(last_photos) == 3:
+                stripes[15:150,20:200]  = cv2.resize(last_photos[-1], (180, 135))
+                stripes[15:150,240:420] = cv2.resize(last_photos[-2], (180, 135))
+                stripes[15:150,460:640] = cv2.resize(last_photos[-3], (180, 135))
+            elif len(last_photos) >= 4:
+                stripes[15:150,20:200]  = cv2.resize(last_photos[-1], (180, 135))
+                stripes[15:150,240:420] = cv2.resize(last_photos[-2], (180, 135))
+                stripes[15:150,460:640] = cv2.resize(last_photos[-3], (180, 135))
+                stripes[15:150,680:860] = cv2.resize(last_photos[-4], (180, 135))
+            img_resp = requests.get(shot)
             img_arr  = np.array(bytearray(img_resp.content), dtype=np.uint8)
-            img_4k = cv2.imdecode(img_arr, -1)
-        ##        img_4k, gray_img = process_inhaler(img_4k, filters)
-            date_and_time = datetime.datetime.now().strftime("%I_%M_%p_%B_%d_%Y_")
-            cv2.imwrite(str(date_and_time) + str(pic_num) + ".jpg", img_4k)
-            pic_num += 1
-            if len(last_photos) >= 4:
-                del last_photos[:]
-                stripes = wrapping_paper[130:295, 0:880].copy()
-            last_photos.append(img_4k)
-            print(str(date_and_time) + str(pic_num) + ".jpg")
-            len(last_photos)
-            break
-        
-        cv2.imshow("Posada FM", background)
-        k = cv2.waitKey(30)
-        frames = frames + 1
-    return
+            img = cv2.imdecode(img_arr, -1)
+            img_big = cv2.resize(img, (880, 660))
+            img_stripes = np.concatenate((img_big, stripes), axis=0)
+            background[75:900,200:1080] = img_stripes
+            if ((frames > 0)  and (frames < 5)):
+                background = show_3(background)
+    ##        if ((frames > 10) and (frames < 20)):
+    ##            print("-")
+            if ((frames > 8) and (frames < 13)):
+                background = show_2(background)
+    ##        if ((frames > 30) and (frames < 40)):
+    ##            print("-")
+            if ((frames > 16) and (frames < 21)):
+                background = show_1(background)
+    ##        if ((frames > 50) and (frames < 60)):
+    ##            print("-")
+            if (frames > 24):
+    ##            print("Taking Pic")
+            ##    requests.get(flash_on)
+                img_resp = requests.get(photo)
+            ##    requests.get(flash_off)
+                img_arr  = np.array(bytearray(img_resp.content), dtype=np.uint8)
+                img_4k = cv2.imdecode(img_arr, -1)
+            ##        img_4k, gray_img = process_inhaler(img_4k, filters)
+                date_and_time = datetime.datetime.now().strftime("%I_%M_%p_%B_%d_%Y_")
+                cv2.imwrite(str(date_and_time) + str(pic_num) + ".jpg", img_4k)
+                pic_num += 1
+                if len(last_photos) >= 4:
+                    del last_photos[:]
+                    stripes = wrapping_paper[130:295, 0:880].copy()
+                last_photos.append(img_4k)
+                print(str(date_and_time) + str(pic_num) + ".jpg")
+                len(last_photos)
+                break
+            
+            cv2.imshow("Posada FM", background)
+            k = cv2.waitKey(30)
+            frames = frames + 1
+    return pic_num
 
 ip = "10.12.5.48"
 shot  = "http://" + ip + ":8080/shot.jpg"
@@ -238,7 +239,7 @@ while True:
     elif k == -1:
         continue
     elif k == 32:
-        take_pic(photo, last_photos, stripes, wrapping_paper, pic_num)
+        pic_num = take_pic(photo, last_photos, stripes, wrapping_paper, pic_num, background)
 ##        requests.get(flash_on)
 ##        img_resp = requests.get()
 ##        requests.get(flash_off)
