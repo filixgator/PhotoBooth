@@ -28,7 +28,138 @@ def process_inhaler(img, filters):
         np.maximum(accum, fimg, accum)
     return accum, img
 
-ip = "192.168.1.67"
+def show_3(full_img):
+    font                   = cv2.FONT_HERSHEY_TRIPLEX
+    bottomLeftCornerOfText = (475,600)
+    fontScale              = 18
+    fontColor              = (0,0,0)
+    lineType               = 18
+
+    cv2.putText(full_img,'3', 
+                bottomLeftCornerOfText, 
+                font, 
+                fontScale,
+                fontColor,
+                lineType)
+    fontColor              = (255,255,255)
+    lineType               = 8
+
+    cv2.putText(full_img,'3', 
+                bottomLeftCornerOfText, 
+                font, 
+                fontScale,
+                fontColor,
+                lineType)
+    return full_img
+def show_2(full_img):
+    font                   = cv2.FONT_HERSHEY_TRIPLEX
+    bottomLeftCornerOfText = (475,600)
+    fontScale              = 18
+    fontColor              = (0,0,0)
+    lineType               = 18
+
+    cv2.putText(full_img,'2', 
+                bottomLeftCornerOfText, 
+                font, 
+                fontScale,
+                fontColor,
+                lineType)
+    fontColor              = (255,255,255)
+    lineType               = 8
+
+    cv2.putText(full_img,'2', 
+                bottomLeftCornerOfText, 
+                font, 
+                fontScale,
+                fontColor,
+                lineType)
+    return full_img
+def show_1(full_img):
+    font                   = cv2.FONT_HERSHEY_TRIPLEX
+    bottomLeftCornerOfText = (475,600)
+    fontScale              = 18
+    fontColor              = (0,0,0)
+    lineType               = 18
+
+    cv2.putText(full_img,'1', 
+                bottomLeftCornerOfText, 
+                font, 
+                fontScale,
+                fontColor,
+                lineType)
+    fontColor              = (255,255,255)
+    lineType               = 8
+
+    cv2.putText(full_img,'1', 
+                bottomLeftCornerOfText, 
+                font, 
+                fontScale,
+                fontColor,
+                lineType)
+    return full_img
+    
+    
+
+def take_pic(photo, last_photos, stripes, wrapping_paper, pic_num):
+    frames = 0
+    while True:
+        if len(last_photos) == 1:
+            stripes[15:150,20:200] = cv2.resize(last_photos[-1], (180, 135))
+        elif len(last_photos) == 2:
+            stripes[15:150,20:200]  = cv2.resize(last_photos[-1], (180, 135))
+            stripes[15:150,240:420] = cv2.resize(last_photos[-2], (180, 135))
+        elif len(last_photos) == 3:
+            stripes[15:150,20:200]  = cv2.resize(last_photos[-1], (180, 135))
+            stripes[15:150,240:420] = cv2.resize(last_photos[-2], (180, 135))
+            stripes[15:150,460:640] = cv2.resize(last_photos[-3], (180, 135))
+        elif len(last_photos) >= 4:
+            stripes[15:150,20:200]  = cv2.resize(last_photos[-1], (180, 135))
+            stripes[15:150,240:420] = cv2.resize(last_photos[-2], (180, 135))
+            stripes[15:150,460:640] = cv2.resize(last_photos[-3], (180, 135))
+            stripes[15:150,680:860] = cv2.resize(last_photos[-4], (180, 135))
+        img_resp = requests.get(shot)
+        img_arr  = np.array(bytearray(img_resp.content), dtype=np.uint8)
+        img = cv2.imdecode(img_arr, -1)
+        img_big = cv2.resize(img, (880, 660))
+        img_stripes = np.concatenate((img_big, stripes), axis=0)
+        background[75:900,200:1080] = img_stripes
+        if ((frames > 0)  and (frames < 5)):
+            print("3")
+##        if ((frames > 10) and (frames < 20)):
+##            print("-")
+        if ((frames > 10) and (frames < 15)):
+            print("2")
+##        if ((frames > 30) and (frames < 40)):
+##            print("-")
+        if ((frames > 20) and (frames < 25)):
+            print("1")
+##        if ((frames > 50) and (frames < 60)):
+##            print("-")
+        if (frames > 30):
+##            print("Taking Pic")
+        ##    requests.get(flash_on)
+            img_resp = requests.get(photo)
+        ##    requests.get(flash_off)
+            img_arr  = np.array(bytearray(img_resp.content), dtype=np.uint8)
+            img_4k = cv2.imdecode(img_arr, -1)
+        ##        img_4k, gray_img = process_inhaler(img_4k, filters)
+            date_and_time = datetime.datetime.now().strftime("%I_%M_%p_%B_%d_%Y_")
+            cv2.imwrite(str(date_and_time) + str(pic_num) + ".jpg", img_4k)
+            pic_num += 1
+            if len(last_photos) >= 4:
+                del last_photos[:]
+                stripes = wrapping_paper[130:295, 0:880].copy()
+            last_photos.append(img_4k)
+            print(str(date_and_time) + str(pic_num) + ".jpg")
+            len(last_photos)
+            break
+        
+        cv2.imshow("Posada FM", background)
+        k = cv2.waitKey(30)
+        frames = frames + 1
+    return
+
+ip = "10.12.5.48"
 shot  = "http://" + ip + ":8080/shot.jpg"
 photo = "http://" + ip + ":8080/photoaf.jpg"
 flash_on  = "http://" + ip + ":8080/enabletorch"
@@ -40,11 +171,11 @@ url_background = 'https://raw.githubusercontent.com/filixgator/PhotoBooth/master
 url_red_gradient = 'https://raw.githubusercontent.com/filixgator/PhotoBooth/master/colors.jpg'
 
 last_photos = []
-##wrapping_paper = cv2.imread('trees.jpg', 1)
-wrapping_paper = url_to_image(url_trees)
+wrapping_paper = cv2.imread('trees.jpg', 1)
+##wrapping_paper = url_to_image(url_trees)
 stripes = wrapping_paper[130:295, 0:880].copy()
-##snow = cv2.imread('background_1.jpg', 1)
-snow = url_to_image(url_background)
+snow = cv2.imread('noche_buenas.jpg', 1)
+##snow = url_to_image(url_background)
 background = snow[0:1024,0:1280]
 
 txt_mask = np.zeros((background.shape[0],background.shape[1]), np.uint8)
@@ -58,7 +189,7 @@ fontScale              = 2
 fontColor              = (255)
 lineType               = 2
 
-cv2.putText(txt_mask,'posadafm.com', 
+cv2.putText(txt_mask,'192.168.1.214', 
             bottomLeftCornerOfText, 
             font, 
             fontScale,
@@ -107,21 +238,22 @@ while True:
     elif k == -1:
         continue
     elif k == 32:
-        requests.get(flash_on)
-        img_resp = requests.get(photo)
-        requests.get(flash_off)
-        img_arr  = np.array(bytearray(img_resp.content), dtype=np.uint8)
-        img_4k = cv2.imdecode(img_arr, -1)
-##        img_4k, gray_img = process_inhaler(img_4k, filters)
-        date_and_time = datetime.datetime.now().strftime("%I_%M_%p_%B_%d_%Y_")
-        cv2.imwrite(str(date_and_time) + str(pic_num) + ".jpg", img_4k)
-        pic_num += 1
-        if len(last_photos) >= 4:
-            del last_photos[:]
-            stripes = wrapping_paper[130:295, 0:880].copy()
-        last_photos.append(img_4k)
-        print(str(date_and_time) + str(pic_num) + ".jpg")
-        len(last_photos)
+        take_pic(photo, last_photos, stripes, wrapping_paper, pic_num)
+##        requests.get(flash_on)
+##        img_resp = requests.get()
+##        requests.get(flash_off)
+##        img_arr  = np.array(bytearray(img_resp.content), dtype=np.uint8)
+##        img_4k = cv2.imdecode(img_arr, -1)
+####        img_4k, gray_img = process_inhaler(img_4k, filters)
+##        date_and_time = datetime.datetime.now().strftime("%I_%M_%p_%B_%d_%Y_")
+##        cv2.imwrite(str(date_and_time) + str(pic_num) + ".jpg", img_4k)
+##        pic_num += 1
+##        if len(last_photos) >= 4:
+##            del last_photos[:]
+##            stripes = wrapping_paper[130:295, 0:880].copy()
+##        last_photos.append(img_4k)
+##        print(str(date_and_time) + str(pic_num) + ".jpg")
+##        len(last_photos)
     elif k == 102:
         if flash:
             requests.get(flash_off)
@@ -133,11 +265,3 @@ while True:
     else:
         print(k)
 cv2.destroyAllWindows()
-
-##img_resp = requests.get(photo)
-##img_arr  = np.array(bytearray(img_resp.content), dtype=np.uint8)
-##img = cv2.imdecode(img_arr, -1)
-##cv2.imwrite("wapo.jpg", img)
-##cv2.imshow("Android Cam", img)
-##cv2.waitKey(0)
-##cv2.destroyAllWindows()
